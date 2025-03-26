@@ -1,17 +1,20 @@
 const express = require("express");
 const morgan = require("morgan");
+const dotenv = require("dotenv");
+const cors = require("cors");
 
 const connection = require("./src/config/db");
 const TaskRouter = require("./src/routes/taskRouter");
 const EmpRouter = require ("./src/routes/employeeRouter");
 const AdminRouter = require ("./src/routes/adminRouter");
 
-
+dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
-app.use(morgan);
+app.use(cors());
+// app.use(morgan());
 
 app.get("/", async (req, res) => {
     try {
@@ -28,9 +31,9 @@ app.get("/", async (req, res) => {
     }
   });
 
-  app.use("api/Task",TaskRouter);
-  app.use("api/Employee",EmpRouter);
-  app.use("api/Admin",EmpRouter);
+app.use("/api/task",TaskRouter);
+app.use("/api/employee",EmpRouter);
+app.use("/api/admin",AdminRouter);
 
   app.listen(PORT, async () => {
     try {

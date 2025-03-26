@@ -1,8 +1,11 @@
+const { log } = require("console");
 const TaskModel = require("../models/taskModel");
 
 module.exports.createTask = async (req,res)=>{
     try {
         const data = req.body;
+        // console.log(data);
+        
         const newTask = await TaskModel(data);
         newTask.save();
         res.status(200).json({message:"Task is created successfully",newTask});

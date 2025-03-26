@@ -1,9 +1,9 @@
 const { errorResponse } = require("../helpers/successAndError");
-const UserModel = require("../src/models/employeeModel");
+const EmpModel = require("../models/employeeModel");
 
 function checkRole(...role) {
   return async function (req, res, next) {
-    const user = await UserModel.findById(req.userId);
+    const user = await EmpModel.findById(req.userId);
     req.user = user;
 
     if (req.user && role.includes(req.user.role)) {

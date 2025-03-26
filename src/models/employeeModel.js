@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { type } = require("os");
+
 
 const empSchema = new mongoose.Schema({
     name:{
@@ -7,7 +7,7 @@ const empSchema = new mongoose.Schema({
         required:true
     },
     number:{
-        type:Number,
+        type:String,
         required:true,
         unique: true,
     },
