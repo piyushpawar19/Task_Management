@@ -8,7 +8,7 @@ const { checkRole } = require("../middlewares/authorization");
 const AdminRouter = express.Router();
 
 AdminRouter.post("/createEmployee",authenticate, checkRole("admin"), addNewEmployee);
-// AdminRouter.post("/adminlogin",adminLogin);
+
 AdminRouter.post("/login", empLogin);
 
 

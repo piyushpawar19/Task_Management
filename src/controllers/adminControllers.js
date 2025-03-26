@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const {
   errorResponse,
   successResponse,
@@ -27,7 +27,6 @@ module.exports.addNewEmployee = async (req, res) => {
         .json(errorResponse(400, "User is already registered"));
     }
     const hashedPassword = await bcrypt.hash(number, SALT_ROUNDS);
-
     if (!hashedPassword) {
       return res
         .status(500)
@@ -62,14 +61,18 @@ module.exports.empLogin = async (req, res) => {
   try {
     const { number, password } = req.body;
 
-    let user = await EmpModel.findOne({ number }).lean();
-    console.log(user);
+    let user = await EmpModel.findOne({ number });
+    // console.log(user);
     if(!user){
         return res.status(401).json(errorResponse(401, "User is not registred"));
     }
     
-
-    const matchPassword = await bcrypt.compare(password, user.password)
+    // console.log(user.password);
+    // console.log(password);
+     
+    const matchPassword = (await bcrypt.compare(password, user.password))
+    console.log(matchPassword);
+    
     if(!matchPassword){
         return res.status(401).json(errorResponse(401, "Invalid credentials"));
 
