@@ -20,6 +20,7 @@ module.exports.createTask = async (req, res) => {
     }
 };
 
+
 module.exports.getTask = async (req,res)=>{
     try {
         const getAllTasks = await TaskModel.find();
@@ -52,3 +53,4 @@ module.exports.deleteTask = async (req,res)=>{
         res.status(500).json({message:"Task are not found",details:error.message});
     }
 }
+

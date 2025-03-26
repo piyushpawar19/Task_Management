@@ -107,7 +107,6 @@ module.exports.empLogin = async (req, res) => {
 
       console.log("🔹 Stored Hashed Password in DB:", user.password);
       console.log("🔹 Entered Password from User:", password);
-  
      
       const matchPassword = await bcrypt.compare(password, user.password);
       console.log("🔹 Password Match Result:", matchPassword);
@@ -132,21 +131,24 @@ module.exports.empLogin = async (req, res) => {
     }
   };
 
-module.exports.getUserTask = async (req, res) => {
-    try {
-        const task = await TaskModel.find({
-            assignEmp: req.params.id,
-          })
+  module.exports.getTaskforFlagDay = async (req, res) => {
+   try {
+        const id  = req.params.id; 
+        const {flagday} = req.query;       
 
-          if (!task) {
-            return res
-              .status(404)
-              .json(errorResponse(404, "Task was not found"));
-          }
-          res.json(successResponse(200, "Task found", task));
+        const validFlagDays = ["Today", "Next Day", "Day After Tomorrow"];
+        if (!validFlagDays.includes(flagday)) {
+            return res.status(400).json({ message: "Invalid flagday. Use: Today, Next Day, Day After Tomorrow." });
+        }
+
+        const tasks = await TaskModel.find({ assignEmp: id, flagday });
+
+        if (tasks.length === 0) {
+            return res.status(404).json({ message: `No tasks found for ${flagday}.` });
+        }
+
+        res.status(200).json({ message: `Tasks for ${flagday} retrieved successfully`, tasks });
     } catch (error) {
-      console.log("Error:", error.message);
-      res.status(500).json(errorResponse(500, error.message));
+        res.status(500).json({ message: "Error retrieving tasks", details: error.message });
     }
-    
-}
+};
