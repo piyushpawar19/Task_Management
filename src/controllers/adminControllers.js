@@ -6,7 +6,7 @@ const {
 } = require("../helpers/successAndError");
 
 const EmpModel = require("../models/employeeModel");
-const { error } = require("console");
+const TaskModel = require("../models/taskModel");
 
 const SALT_ROUNDS = Number(process.env.SALT_ROUNDS);
 
@@ -57,52 +57,27 @@ module.exports.addNewEmployee = async (req, res) => {
     res.status(400).json(errorResponse(400, error.message));
   }
 };
-module.exports.empLogin = async (req, res) => {
-  try {
-    const { number, password } = req.body;
-
-    let user = await EmpModel.findOne({ number });
-    // console.log(user);
-    if(!user){
-        return res.status(401).json(errorResponse(401, "User is not registred"));
-    }
-    
-    // console.log(user.password);
-    // console.log(password);
-     
-    const matchPassword = (await bcrypt.compare(password, user.password))
-    console.log(matchPassword);
-    
-    if(!matchPassword){
-        return res.status(401).json(errorResponse(401, "Invalid credentials"));
-
-    }
-      
-
-    const accessToken = jwt.sign({ userId: user._id }, ACCESS_TOKEN_SECRET, {
-      expiresIn: ACCESS_TOKEN_EXPIRATION,
-    });
-
-    let succData = successResponse(200, "Login successful", user);
-    succData.accessToken = accessToken;
-
-    res.status(200).json(succData);
-  } catch (error) {
-    console.log(error.message);
-
-    res.status(500).json(errorResponse(500, error.message));
-  }
-};
-
-// module.exports.adminLogin = async (req, res) => {
+// module.exports.empLogin = async (req, res) => {
 //   try {
 //     const { number, password } = req.body;
 
-//     let user = await EmpModel.findOne({ number }).lean();
-
-//     if (!user || !(await bcrypt.compare(password, user.password))) {
-//       return res.status(401).json(errorResponse(401, "Invalid credentials"));
+//     let user = await EmpModel.findOne({ number });
+//     // console.log(user);
+//     if(!user){
+//         return res.status(401).json(errorResponse(401, "User is not registred"));
 //     }
+    
+//     // console.log(user.password);
+//     // console.log(password);
+     
+//     const matchPassword = (await bcrypt.compare(password, user.password))
+//     console.log(matchPassword);
+    
+//     if(!matchPassword){
+//         return res.status(401).json(errorResponse(401, "Invalid credentials"));
+
+//     }
+      
 
 //     const accessToken = jwt.sign({ userId: user._id }, ACCESS_TOKEN_SECRET, {
 //       expiresIn: ACCESS_TOKEN_EXPIRATION,
@@ -118,3 +93,60 @@ module.exports.empLogin = async (req, res) => {
 //     res.status(500).json(errorResponse(500, error.message));
 //   }
 // };
+
+module.exports.empLogin = async (req, res) => {
+    try {
+      const { number, password } = req.body;
+  
+      let user = await EmpModel.findOne({ number });
+      
+      if (!user) {
+        return res.status(401).json(errorResponse(401, "User is not registered"));
+      }
+  
+
+      console.log("🔹 Stored Hashed Password in DB:", user.password);
+      console.log("🔹 Entered Password from User:", password);
+  
+     
+      const matchPassword = await bcrypt.compare(password, user.password);
+      console.log("🔹 Password Match Result:", matchPassword);
+  
+      if (!matchPassword) {
+        return res.status(401).json(errorResponse(401, "Invalid credentials"));
+      }
+  
+      const accessToken = jwt.sign(
+        { userId: user._id },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: process.env.ACCESS_TOKEN_EXPIRATION || "1d" }
+      );
+  
+      let succData = successResponse(200, "Login successful", user);
+      succData.accessToken = accessToken;
+  
+      res.status(200).json(succData);
+    } catch (error) {
+      console.log("Error:", error.message);
+      res.status(500).json(errorResponse(500, error.message));
+    }
+  };
+
+module.exports.getUserTask = async (req, res) => {
+    try {
+        const task = await TaskModel.find({
+            assignEmp: req.params.id,
+          })
+
+          if (!task) {
+            return res
+              .status(404)
+              .json(errorResponse(404, "Task was not found"));
+          }
+          res.json(successResponse(200, "Task found", task));
+    } catch (error) {
+      console.log("Error:", error.message);
+      res.status(500).json(errorResponse(500, error.message));
+    }
+    
+}

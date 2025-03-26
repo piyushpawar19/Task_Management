@@ -8,6 +8,7 @@ const TaskRouter = require("./src/routes/taskRouter");
 const EmpRouter = require ("./src/routes/employeeRouter");
 const AdminRouter = require ("./src/routes/adminRouter");
 
+require("./src/helpers/taskScheduler");
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;

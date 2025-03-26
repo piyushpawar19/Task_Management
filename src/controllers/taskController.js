@@ -1,16 +1,22 @@
 const { log } = require("console");
 const TaskModel = require("../models/taskModel");
 
-module.exports.createTask = async (req,res)=>{
+module.exports.createTask = async (req, res) => {
     try {
-        const data = req.body;
-        // console.log(data);
-        
-        const newTask = await TaskModel(data);
-        newTask.save();
-        res.status(200).json({message:"Task is created successfully",newTask});
+        const { title, description, assignEmp, flagday } = req.body;
+
+
+        const taskCount = await TaskModel.countDocuments({ flagday });
+        if (taskCount >= 6) {
+            return res.status(400).json({ message: `Only 6 tasks allowed for ${flagday}` });
+        }
+
+        const newTask = new TaskModel({ title, description, assignEmp, flagday });
+        await newTask.save();
+
+        res.status(201).json({ message: "Task created successfully", newTask });
     } catch (error) {
-        res.status(500).json({message:"Task is not created",details:error.message});
+        res.status(500).json({ message: "Task creation failed", details: error.message });
     }
 };
 
