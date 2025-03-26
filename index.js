@@ -4,13 +4,14 @@ const morgan = require("morgan");
 const connection = require("./src/config/db");
 const TaskRouter = require("./src/routes/taskRouter");
 const EmpRouter = require ("./src/routes/employeeRouter");
+const AdminRouter = require ("./src/routes/adminRouter");
 
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
-app.use(morgan("dev"));
+app.use(morgan);
 
 app.get("/", async (req, res) => {
     try {
@@ -29,6 +30,7 @@ app.get("/", async (req, res) => {
 
   app.use("api/Task",TaskRouter);
   app.use("api/Employee",EmpRouter);
+  app.use("api/Admin",EmpRouter);
 
   app.listen(PORT, async () => {
     try {
