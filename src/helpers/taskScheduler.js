@@ -1,19 +1,21 @@
-const cron = require("node-cron");
+const mongoose = require("mongoose");
 const TaskModel = require("../models/taskModel");
 
-
-cron.schedule("0 0 * * *", async () => {
+const updateFlagday = async () => {
     try {
-        console.log(" Running daily Flagday update...");
-
+        console.log("Running daily Flagday update...");
 
         await TaskModel.updateMany({ flagday: "Next Day" }, { flagday: "Today" });
-
 
         await TaskModel.updateMany({ flagday: "Day After Tomorrow" }, { flagday: "Next Day" });
 
         console.log("Flagday updated successfully.");
     } catch (error) {
-        console.error(" Error updating Flagday:", error.message);
+        console.error("Error updating Flagday:", error.message);
     }
-});
+};
+
+
+setInterval(updateFlagday, 24 * 60 * 60 * 1000);
+
+module.exports = updateFlagday;

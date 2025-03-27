@@ -6,6 +6,8 @@ const {
   const EmpModel = require("../models/employeeModel");
   const TaskModel = require("../models/taskModel");
 
+  const bcrypt = require("bcrypt")
+
   const SALT_ROUNDS = Number(process.env.SALT_ROUNDS);
   
   module.exports.getEmployee = async (req, res) => {
