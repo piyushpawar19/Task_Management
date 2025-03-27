@@ -8,29 +8,52 @@ module.exports.createTask = async (req, res) => {
     try {
         const { title, description, assignEmp, flagday } = req.body;
 
+        const formattedFlagday = flagday.trim();
 
-        const taskCount = await TaskModel.countDocuments({ assignEmp, flagday });
+        const taskCount = await TaskModel.countDocuments({ assignEmp, flagday: formattedFlagday });
 
         if (taskCount >= 6) {
-            return res.status(400).json(errorResponse(400, `Only 6 tasks allowed for ${flagday} for this employee`));
+            return res.status(400).json(errorResponse(400, `Only 6 tasks allowed for ${formattedFlagday} for this employee`));
         }
 
-        if (flagday === "Next Day" || flagday === "Day After Tomorrow") {
+        // console.log("Flagday received:", formattedFlagday);
+
+        if (formattedFlagday === "Next Day") {
             const todayTaskCount = await TaskModel.countDocuments({ assignEmp, flagday: "Today" });
+            // console.log(`Today task count for ${assignEmp}:`, todayTaskCount);
 
             if (todayTaskCount < 6) {
-                return res.status(400).json(errorResponse(400, "Complete 6 tasks for Today before scheduling future tasks"));
+                return res.status(400).json(errorResponse(400, "Complete 6 tasks for Today before scheduling tasks for Next Day"));
             }
         }
 
-        const newTask = new TaskModel({ title, description, assignEmp, flagday });
+        if (formattedFlagday === "Day After Tomorrow") {
+            const todayTaskCount = await TaskModel.countDocuments({ assignEmp, flagday: "Today" });
+            const nextDayTaskCount = await TaskModel.countDocuments({ assignEmp, flagday: "Next Day" });
+
+            // console.log(`Today task count for ${assignEmp}:`, todayTaskCount);
+            // console.log(`Next Day task count for ${assignEmp}:`, nextDayTaskCount);
+
+            if (todayTaskCount < 6) {
+                return res.status(400).json(errorResponse(400, "Complete 6 tasks for Today before scheduling tasks for Day After Tomorrow"));
+            }
+
+            if (nextDayTaskCount < 6) {
+                return res.status(400).json(errorResponse(400, "Complete 6 tasks for Next Day before scheduling tasks for Day After Tomorrow"));
+            }
+        }
+
+        const newTask = new TaskModel({ title, description, assignEmp, flagday: formattedFlagday });
         await newTask.save();
 
         res.status(201).json(successResponse(201, "Task created successfully", newTask));
     } catch (error) {
+        console.error("Error in createTask:", error);
         res.status(500).json(errorResponse(500, "Task creation failed", error.message));
     }
 };
+
+
 
 
 
