@@ -6,7 +6,7 @@ const { checkRole } = require("../middlewares/authorization");
 
 const EmpRouter = express.Router();
 
-EmpRouter.get("/getEmp",authenticate, checkRole("admin"),getEmployee);
+EmpRouter.get("/getEmp",authenticate,getEmployee);
 EmpRouter.put("/updateEmp",authenticate, updateEmployee);
 EmpRouter.delete("/deleteEmp",authenticate, checkRole("admin"),deleteEmployee);
 EmpRouter.get("/flagdayTask",authenticate,getTaskforFlagDay);

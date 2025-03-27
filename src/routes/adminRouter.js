@@ -1,5 +1,5 @@
 const express = require("express");
-const { addNewEmployee,empLogin ,getTaskforFlagDay} = require("../controllers/adminControllers");
+const { addNewEmployee,empLogin ,getTaskforFlagDay,getAllEmployee} = require("../controllers/adminControllers");
 
 const {authenticate} = require("../middlewares/authenticate")
 // const checkRole = require("../middlewares/authorization")
@@ -12,6 +12,8 @@ AdminRouter.post("/createEmployee",authenticate, checkRole("admin"), addNewEmplo
 AdminRouter.post("/login", empLogin);
 
 AdminRouter.get("/flagdayTask/:id",authenticate,checkRole("admin"), getTaskforFlagDay);
+
+AdminRouter.get("/getAllEmp",authenticate, checkRole("admin"),getAllEmployee);
 
 
 module.exports=AdminRouter;

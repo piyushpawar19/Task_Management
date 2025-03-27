@@ -8,9 +8,19 @@ module.exports.createTask = async (req, res) => {
     try {
         const { title, description, assignEmp, flagday } = req.body;
 
-        const taskCount = await TaskModel.countDocuments({ flagday });
+
+        const taskCount = await TaskModel.countDocuments({ assignEmp, flagday });
+
         if (taskCount >= 6) {
-            return res.status(400).json(errorResponse(400, `Only 6 tasks allowed for ${flagday}`));
+            return res.status(400).json(errorResponse(400, `Only 6 tasks allowed for ${flagday} for this employee`));
+        }
+
+        if (flagday === "Next Day" || flagday === "Day After Tomorrow") {
+            const todayTaskCount = await TaskModel.countDocuments({ assignEmp, flagday: "Today" });
+
+            if (todayTaskCount < 6) {
+                return res.status(400).json(errorResponse(400, "Complete 6 tasks for Today before scheduling future tasks"));
+            }
         }
 
         const newTask = new TaskModel({ title, description, assignEmp, flagday });
@@ -21,6 +31,7 @@ module.exports.createTask = async (req, res) => {
         res.status(500).json(errorResponse(500, "Task creation failed", error.message));
     }
 };
+
 
 
 module.exports.getTask = async (req, res) => {

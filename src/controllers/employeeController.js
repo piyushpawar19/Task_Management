@@ -12,7 +12,8 @@ const {
   
   module.exports.getEmployee = async (req, res) => {
       try {
-          const getEmployee = await EmpModel.find();
+          const id = req.userId;
+          const getEmployee = await EmpModel.findById(id);
           res.status(200).json(successResponse(200, "Employee data fetched", getEmployee));
       } catch (error) {
           res.status(500).json(errorResponse(500, "Failed to fetch employee data", error.message));

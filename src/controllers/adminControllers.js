@@ -111,3 +111,12 @@ module.exports.empLogin = async (req, res) => {
         res.status(500).json({ message: "Error retrieving tasks", details: error.message });
     }
 };
+
+  module.exports.getAllEmployee = async (req, res) => {
+      try {
+          const getEmployee = await EmpModel.find();
+          res.status(200).json(successResponse(200, "Employee data fetched", getEmployee));
+      } catch (error) {
+          res.status(500).json(errorResponse(500, "Failed to fetch employee data", error.message));
+      }
+  };
